@@ -5,10 +5,7 @@
     }
   ],
   "settings": {
-    "python.analysis.extraPaths": [
-      "${workspaceFolder}/*",
-      "${workspaceFolder}/laboratory_work_1"
-    ],
-    "python.autoComplete.extraPaths": ["./*"]
+    "python.analysis.extraPaths": ["${workspaceFolder}/libs/*"],
+    "python.autoComplete.extraPaths": ["./libs/*"]
   }
 }

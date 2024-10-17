@@ -7,7 +7,7 @@ import numpy as np
 
 
 @dataclass
-class Characts:
+class Characteristics:
     """Get characteristics"""
 
     def all(self, data):
@@ -23,17 +23,20 @@ class Characts:
             - Середньо-квадратичне відхилення
         """
 
-        average_val = np.mean(data)
+        mean = np.mean(data)
         dispersion = np.var(data)
-        mean_square = np.sqrt(dispersion)
+        mean_sqrt = np.sqrt(dispersion)
 
-        print("-" * 20)
+        title = "<<< Статистичні характеристики розподілу >>>"
+        divider = "-" * len(title)
+
+        print(divider)
         print("Номери: ", data)
-        print("\n<<< Статистичні характеристики розподілу >>>")
-        print("Матиматичне сподівання: ", average_val)
+        print(f"\n{title}")
+        print("Матиматичне сподівання: ", mean)
         print("Дисперсія: ", dispersion)
-        print("Середньо-квадратичне відхилення: ", mean_square)
-        print("-" * 20)
+        print("Середньо-квадратичне відхилення: ", mean_sqrt)
+        print(divider)
 
     # def __mnk(self, S0):
     #     """МНК згладжування"""
@@ -133,7 +136,7 @@ class Characts:
 
     #     return Yout_Extrapol
 
-    def stat_in(self, data, text):
+    def stat_in(self, data, title):
         """Статистичні характеристики вибірки з урахуванням тренду"""
 
         trend = self.__mnk_stat_characts(data)
@@ -141,12 +144,15 @@ class Characts:
         result = np.subtract(data[:trend_len], trend[:trend_len, 0])
         mean = np.mean(result)
         dispersion = np.var(result)
-        mean_square = mt.sqrt(dispersion)
+        mean_sqrt = mt.sqrt(dispersion)
 
-        print("-" * 20)
-        print("-" * 10, text, "-" * 10)
+        text = "-" * 10 + title + "-" * 10
+        divider = "-" * len(text)
+
+        print(divider)
+        print(text)
         print("Кількість елементів вбірки: ", trend_len)
         print("Матиматичне сподівання: ", mean)
         print("Дисперсія: ", dispersion)
-        print("СКВ: ", mean_square)
-        print("-" * 20)
+        print("СКВ: ", mean_sqrt)
+        print(divider)
