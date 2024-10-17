@@ -1,4 +1,0 @@
-{
-  "reportMissingImports": true,
-  "exclude": ["**/node_modules", "**/__pycache__"]
-}

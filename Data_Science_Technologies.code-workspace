@@ -1,8 +1,14 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "python.analysis.extraPaths": [
+      "${workspaceFolder}/*",
+      "${workspaceFolder}/laboratory_work_1"
+    ],
+    "python.autoComplete.extraPaths": ["./*"]
+  }
 }

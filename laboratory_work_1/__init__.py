@@ -1,124 +1,38 @@
-"""Laboratory work 3"""
+"""Laboratory work 1"""
 
-# pylint: disable=E1101, C0412, W0603
+# pylint: disable=E1121
 
-import sys
-from random import random
-from pathlib import Path
-import numpy as np
-import cv2 as cv
-
-LIBS_PATH = Path.cwd().resolve()
-
-sys.path.append(str(LIBS_PATH))
-
-try:
-    from figure_factory_3d import Utils, Config, Parallelepiped
-except ImportError:
-    from libs.figure_factory_3d import Utils, Config, Parallelepiped
-
-cfg = Config()
-
-cnv = np.full(cfg.cnv_props, 255, dtype=np.uint8)
-
-WIN_NAME = "Window"
-CX = cfg.width / 2
-CY = cfg.height / 2
-BG_COLOR = Utils.hex_to_rgba(cfg.colors[12])
-STROKE_COLOR = Utils.hex_to_rgba(cfg.colors[5])
-prllppd_config = 400, 350, 200
-RX = RY = TX = TY = 0
-COUNTER = 0
-
-prllppd = (
-    Parallelepiped(cnv, *prllppd_config, stroke_width=5)
-    .translate_3d(CX, CY, 0)
-    .rotate_3d(random() * 45, random() * 45, random() * 45)
-)
+from utils import Utils
+from characts import Characts
+from models import Model
+from laws import Laws
 
 
-def mouse_callback(event, x, y, _flags, _params):
-    """Mouse callback"""
+if __name__ == "__main__":
+    DATA_LEN = 10_000
+    MAX_VAL = int(DATA_LEN)
 
-    global RX, RY
+    utils = Utils()
+    characts = Characts()
+    laws = Laws()
+    model = Model()
 
-    if event == cv.EVENT_MOUSEMOVE:
-        RX = 100 / CX * (x - CX) / -100
-        RY = 100 / CY * (y - CY) / -100
+    even = laws.even(DATA_LEN, MAX_VAL)
+    characts.all(even)
+    laws.hist(even)
 
+    normal = laws.normal(DATA_LEN, 0, 10)
+    characts.all(normal)
+    laws.hist(normal)
 
-def keyboard_callback(key):
-    """Keyboard callback"""
+    exponential = laws.exponential(DATA_LEN, 2.5)
+    laws.hist(exponential)
 
-    global TX, TY
+    ideal = model.ideal(DATA_LEN, coef=0.000001)
+    norm = model.norm(normal, ideal)
+    abnormal = model.abnormal(even, ideal, norm, 20, 6, 25)
 
-    if key == ord("q"):
-        return False
-
-    if key == ord("a"):
-        TX = -1
-
-    if key == ord("d"):
-        TX = 1
-
-    if key == ord("w"):
-        TY = -1
-
-    if key == ord("s"):
-        TY = 1
-
-    if key == ord("c"):
-        TX = TY = 0
-
-    return True
-
-
-b = 255 - STROKE_COLOR[0]
-g = 255 - STROKE_COLOR[1]
-r = 255 - STROKE_COLOR[2]
-
-
-def animation() -> None:
-    """Main animation"""
-
-    global COUNTER
-
-    cnv.fill(255)
-    cnv[:] = BG_COLOR
-
-    coef = np.sin(COUNTER / min(b, g, r))
-
-    cfg.grid(cnv, size=200, position=(int(CX), int(CY)))
-
-    prllppd.translate_3d(TX, TY, 0).rotate_3d(RY, RX, 0).draw(
-        stroke_color=Utils.rgba_to_hex(
-            STROKE_COLOR[0] + abs(round(b * coef)),
-            STROKE_COLOR[1] + abs(round(g * coef)),
-            STROKE_COLOR[2] + abs(round(r * coef)),
-        )
-    )
-
-    COUNTER += 1
-
-    cv.imshow(WIN_NAME, cnv)
-
-    key = cv.waitKey(1) & 0xFF
-
-    return keyboard_callback(key)
-
-
-print("Move the mouse left and right to rotate along the Y axis")
-print("Move the mouse up and down to rotate along the X axis")
-print("Press the 'A' and 'D' to move along the X axis")
-print("Press the 'W' and 'S' to move along the Y axis")
-print("Press the 'C' to stop moving")
-print("Press 'Q' for stop")
-
-cv.namedWindow(WIN_NAME, cv.WINDOW_AUTOSIZE)
-cv.setMouseCallback(WIN_NAME, mouse_callback)
-Utils.animate(animation, 0.025)
-
-print("Press any key for exit")
-
-cv.waitKey(0)
-cv.destroyAllWindows()
+    laws.plot(ideal, norm, "Квадратична модель + Норм. шум")
+    characts.stat_in(norm, "Вибірка + Норм. шум")
+    laws.plot(ideal, abnormal, "Квадратична модель + Норм. шум + АВ")
+    characts.stat_in(norm, "Вибірка з АВ")
