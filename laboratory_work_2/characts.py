@@ -35,6 +35,29 @@ class Characts:
         print("Середньо-квадратичне відхилення: ", mean_square)
         print("-" * 20)
 
+    # def __mnk(self, S0):
+    #     """МНК згладжування"""
+
+    #     iter = len(S0)
+    #     Yin = np.zeros((iter, 1))
+    #     F = np.ones((iter, 3))
+
+    #     for i in range(iter):  # формування структури вхідних матриць МНК
+    #         Yin[i, 0] = float(S0[i])  # формування матриці вхідних даних
+    #         F[i, 1] = float(i)
+    #         F[i, 2] = float(i * i)
+
+    #     FT = F.T
+    #     FFT = FT.dot(F)
+    #     FFTI = np.linalg.inv(FFT)
+    #     FFTIFT = FFTI.dot(FT)
+    #     C = FFTIFT.dot(Yin)
+    #     Yout = F.dot(C)
+    #     print("Регресійна модель:")
+    #     print("y(t) = ", C[0, 0], " + ", C[1, 0], " * t", " + ", C[2, 0], " * t^2")
+
+    #     return Yout
+
     def __mnk_stat_characts(self, data: np.ndarray) -> np.ndarray:
         """
         МНК згладжування для визначення статистичних характеристик.
@@ -62,6 +85,53 @@ class Characts:
         trend = f.dot(c)  # Розрахунок тренду
 
         return trend
+
+    # def __mnk_av_detect(self, S0):
+    #     """МНК детекція та очищення АВ"""
+
+    #     iter = len(S0)
+    #     Yin = np.zeros((iter, 1))
+    #     F = np.ones((iter, 3))
+    #     for i in range(iter):  # формування структури вхідних матриць МНК
+    #         Yin[i, 0] = float(S0[i])  # формування матриці вхідних даних
+    #         F[i, 1] = float(i)
+    #         F[i, 2] = float(i * i)
+    #     FT = F.T
+    #     FFT = FT.dot(F)
+    #     FFTI = np.linalg.inv(FFT)
+    #     FFTIFT = FFTI.dot(FT)
+    #     C = FFTIFT.dot(Yin)
+
+    #     return C[1, 0]
+
+    # def mnk_extrapol(self, S0, koef):
+    #     """МНК прогнозування"""
+
+    #     iter = len(S0)
+    #     Yout_Extrapol = np.zeros((iter + koef, 1))
+    #     Yin = np.zeros((iter, 1))
+    #     F = np.ones((iter, 3))
+
+    #     for i in range(iter):  # формування структури вхідних матриць МНК
+    #         Yin[i, 0] = float(S0[i])  # формування матриці вхідних даних
+    #         F[i, 1] = float(i)
+    #         F[i, 2] = float(i * i)
+
+    #     FT = F.T
+    #     FFT = FT.dot(F)
+    #     FFTI = np.linalg.inv(FFT)
+    #     FFTIFT = FFTI.dot(FT)
+    #     C = FFTIFT.dot(Yin)
+
+    #     print("Регресійна модель:")
+    #     print("y(t) = ", C[0, 0], " + ", C[1, 0], " * t", " + ", C[2, 0], " * t^2")
+
+    #     for i in range(iter + koef):
+    #         Yout_Extrapol[i, 0] = (
+    #             C[0, 0] + C[1, 0] * i + (C[2, 0] * i * i)
+    #         )  # проліноміальна крива МНК - прогнозування
+
+    #     return Yout_Extrapol
 
     def stat_in(self, data, text):
         """Статистичні характеристики вибірки з урахуванням тренду"""

@@ -20,9 +20,19 @@ if __name__ == "__main__":
     laws.hist(even)
 
     normal_law = laws.normal(DATA_LEN, 0, 10)
+    characts.all(normal_law)
+    laws.hist(normal_law)
 
-    ideal_model = model.ideal(DATA_LEN, coef=0.001)
+    exponential_law = laws.exponential(DATA_LEN, 2.5)
+    characts.all(exponential_law)
+    laws.hist(exponential_law)
+
+    ideal_model = model.ideal(DATA_LEN, coef=0.000001, sqrt=True)
 
     normal_model = model.norm(normal_law, ideal_model)
     characts.stat_in(normal_model, "Вибірка + Норм. шум")
     laws.plot(ideal_model, normal_model, "Квадратична модель + Норм. шум")
+
+    abnormal_model = model.abnormal(even, ideal_model, normal_model, 20, 6, 25)
+    characts.stat_in(abnormal_model, "Вибірка з АВ")
+    laws.plot(ideal_model, abnormal_model, "Квадратична модель + Норм. шум + АВ")
