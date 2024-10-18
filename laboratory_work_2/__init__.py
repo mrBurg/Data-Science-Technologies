@@ -2,42 +2,48 @@
 
 # pylint: disable=E1121, E0401
 
-from characteristics import Characteristics as Chars
+import math as mt
+
 from models import Model
-from laws import Laws
-from rendering import Rendering as Rend
+from data_generation import DataGeneration as Data
+from utils import Utils
+
+# Закон зміни похибки – рівномірний;
+# Закон зміни досліджуваного процесу – постійна.
 
 
 if __name__ == "__main__":
-    DATA_LEN = 10_000
-    MAX_VAL = int(DATA_LEN)
-    DEVIATION = int(10)
-    DSIG = 5
-    COEF = 0.000001
+    DATA_SIZE = 10_000
+    MAX_VAL = int(DATA_SIZE)
+    ABNORM_SIZE = int((MAX_VAL * 10) / 100)
+    COEF = 0.000005
+    COEF_PREFER = 3
+    DEVIAT = 100
+    MEAN = 0
+    MEAN_SQRT = 3
+    BINS = 50
+    # # WIND = 5
+    # # ALFA = 0.5
 
-    chars = Chars()
-    laws = Laws()
+    data = Data()
     model = Model()
-    rend = Rend()
 
-    even = laws.even(DATA_LEN, MAX_VAL)
-    normal_law = laws.normal(DATA_LEN, DEVIATION, 0)
-    exponential_law = laws.exponential(DATA_LEN, 1.5)
+    # data_uniform = data.uniform(DATA_SIZE, MAX_VAL)
+    # normal_data = data.normal(DATA_SIZE, DEVIAT)
+    # model.hist(data_uniform, bins=BINS, label="Випадкові рівномірні дані")
+    # model.plot(data_uniform, title="Випадкові дані за РІВНОМІРНИМ законом розподілу")
 
-    for i in (even, normal_law, exponential_law):
-        chars.all(i)
-        rend.hist(i)
+    normal_data = data.normal(DATA_SIZE, DEVIAT, MEAN)
+    # model.hist(normal_data, bins=BINS, label="Випадкові нормальні дані")
+    # model.plot(normal_data, title="Випадкові дані за НОРМАЛЬНИМ законом розподілу")
 
-    ideal_model = model.ideal(DATA_LEN, coef=COEF, deg=1)
-    chars.stat_in(ideal_model, "Норм.")
-    rend.plot("Квадратична модель + Норм. шум", "", ideal_model)
+    ideal_model = model.ideal(DATA_SIZE, COEF)
 
-    normal_model = model.normal(normal_law, ideal_model)
-    chars.stat_in(normal_model, "Вибірка + Норм. шум")
-    rend.plot("Квадратична модель + Норм. шум", "", normal_model, ideal_model)
+    normal_model = model.normal(ideal_model, normal_data)
+    # model.plot(normal_model, ideal_model, title="Модель нормального тренду")
 
+    # abnormal_model = model.abnormal(DATA_SIZE, normal_data, COEF, MEAN, MEAN_SQRT)
     abnormal_model = model.abnormal(
-        even, ideal_model, normal_model, DATA_LEN, COEF, DSIG
+        DATA_SIZE, ABNORM_SIZE, normal_data, COEF, COEF_PREFER, MEAN, MEAN_SQRT
     )
-    chars.stat_in(abnormal_model, "Вибірка з АВ")
-    rend.plot("Квадратична модель + Норм. шум + АВ", "", abnormal_model, ideal_model)
+    model.plot(abnormal_model, ideal_model, title="Модель аномального тренду")

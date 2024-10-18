@@ -1,12 +1,14 @@
 """Rendering"""
 
+from abc import ABC
+
 import matplotlib.pyplot as plt
 
 
-class Render:
-    """Render data results"""
+class Rendering(ABC):
+    """Rendering of data"""
 
-    def hist(self, data, **wargs):
+    def hist(self, data, facecolor="#7eb253", **kwargs) -> None:
         """
         Відображає гістограму результатів за допомогою matplotlib.
 
@@ -17,19 +19,15 @@ class Render:
             - alpha (float): Прозорість гістограми.
         """
 
-        bins = wargs.get("bins")
-        facecolor = wargs.get("facecolor")
-        alpha = wargs.get("alpha")
-
         plt.hist(
             data,
-            bins=bins or 20,
-            facecolor=facecolor or "#7eb253",
-            alpha=alpha or 0.5,
+            facecolor=facecolor,
+            **kwargs,
         )
+        plt.legend(loc="lower center")
         plt.show()
 
-    def plot(self, data1, data2, text):
+    def plot(self, title, *data, xlabel="X-axis", ylabel="Y-axis", **kwargs) -> None:
         """
         Візуалізує дві криві на одному графіку.
 
@@ -48,9 +46,10 @@ class Render:
         """
 
         plt.clf()  # Очищення холста
-        plt.plot(data2)
-        plt.plot(data1)
-        plt.xlabel("Похибка")
-        plt.ylabel("Ймовірність")
-        plt.ylabel(text)
+
+        for i in data:
+            plt.plot(i, **kwargs)
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
         plt.show()

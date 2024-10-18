@@ -1,57 +1,65 @@
 """Models"""
 
-# pylint: disable=R0913
+# pylint: disable=R0913, E0401
 
 import numpy as np
 
+from characteristics import Characteristics as Characts
+from rendering import Rendering as Render
 
-class Model:
+
+class Model(Characts, Render):
     """Models"""
 
-    def ideal(self, data_len, coef=0.0000005, sqrt=False):
+    def __init__(self) -> None:
+        super().__init__(self)
+
+    def permanent(self, data_size, val) -> np.ndarray:  # Тренд
         """
-        Модель ідеального тренду (квадратичний закон)
+        Модель постійного тренду
 
-        :param data_len: Довжина даних (кількість точок)
-        :param coef: Коефіцієнт для квадратичної моделі
-        :param sqrt: Піднесення до квадрату
-        :return: Массив даних, що відповідає ідеальному тренду
+        :param data_size: Довжина даних (кількість точок)
+        :param val: Значення, що додається
+        :return: Массив даних, що відповідає постійному тренду
         """
 
-        return coef * np.arange(data_len) ** (2 if sqrt else 1)
+        return np.full(data_size, val)
 
-    def norm(self, mean, ideal):
+    def normal(self, data, expan) -> np.ndarray:  # Адитивна суміш
         """
         Генерація значень за нормальним законом розподілу
 
-        :param mean: Математичне сподівання (середнє значення)
-        :param ideal: Массив ідеальних значень для моделі
+        :param data: Математичне сподівання (середнє значення)
+        :param expan: Массив ідеальних значень для моделі
         :return: Массив згенерованих значень, що відповідають нормальному розподілу
         """
 
-        return mean + ideal
+        return data + expan
 
-    def abnormal(self, even, ideal, norm, size, coef, deviation):
+    def mnk(self, data: np.ndarray) -> np.ndarray:
         """
-        Генерація аномальних даних з випадковими похибками
+        МНК згладжування для визначення статистичних характеристик.
 
-        :param even: Массив рівномірно розподілених індексів
-        :param ideal: Массив ідеальних значень для моделі
-        :param norm: Массив нормальних значень
-        :param size: Кількість даних для генерації
-        :param coef: Коефіцієнт для нормального закону розподілу
-        :param dsig: Стандартне відхилення для нормального закону розподілу
-        :return: Массив даних із доданими аномальними похибками
+        Виконує метод найменших квадратів (МНК) для знаходження тренду вхідних даних.
+
+        :param data: Вхідні дані у вигляді одномірного масиву.
+        :return: Масив значень тренду, отриманих за допомогою МНК.
         """
+        data_len = len(data)
+        yin = np.zeros((data_len, 1))  # Матриця вхідних даних
+        f = np.ones((data_len, 3))  # Матриця функцій для МНК
 
-        data = norm
-        norm = np.random.normal(0, (coef * deviation), size)
+        # Формування структури вхідних матриць МНК
+        for i in range(data_len):
+            yin[i, 0] = float(data[i])  # Матриця вхідних даних
+            f[i, 1] = float(i)
+            f[i, 2] = float(i * i)
 
-        # аномальна випадкова похибка з нормальним законом
-        for i in range(size):
-            k = int(even[i])
-            data[k] = (
-                ideal[k] + norm[i]
-            )  # аномальні вимірів з рівномірно розподіленими номерами
+        ft = f.T  # Транспонована матриця
+        fft = ft.dot(f)  # Добуток матриць
+        ffti = np.linalg.inv(fft)  # Обернена матриця
+        fftift = ffti.dot(ft)  # Добуток оберненої матриці і транспонованої
+        c = fftift.dot(yin)  # Коефіцієнти тренду
+        trend = f.dot(c)  # Розрахунок тренду
 
-        return data
+        return trend

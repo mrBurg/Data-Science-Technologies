@@ -1,10 +1,10 @@
 """Characteristics"""
 
-# pylint: disable=R0913, E0401
+# pylint: disable=R0913
 
 from typing import TYPE_CHECKING
 import math as mt
-from abc import ABC  # abstractmethod
+from abc import ABC
 
 
 import numpy as np
@@ -19,17 +19,7 @@ class Characteristics(ABC):
     def __init__(self, model: "Model") -> None:
         self.model = model
 
-    # @abstractmethod метод помічений як @abstractmethod необхідно реалізовувати у класі нащадка
-    def _print_data(
-        self,
-        title,
-        data,
-        mean,
-        dispersion,
-        mean_sqrt,
-        delta=None,
-        mean_sqrt_extrapol=None,
-    ) -> None:
+    def _print_data(self, title, data, mean, dispersion, mean_sqrt) -> None:
         """
         Виводить всі статистичні характеристики розподілу.
 
@@ -38,8 +28,6 @@ class Characteristics(ABC):
         :param mean: Математичне сподівання.
         :param dispersion: Дисперсія.
         :param mean_sqrt: Середньо-квадратичне відхилення (СКВ).
-        :param delta: Динамічна похибка моделі.
-        :param mean_sqrt: Прогнозоване середньо-квадратичне відхилення (ПСКВ).
 
         Виводить:
             - Кількість елементів вбірки
@@ -57,16 +45,6 @@ class Characteristics(ABC):
         print("Математичне сподівання: ", mean)
         print("Дисперсія: ", dispersion)
         print("Середньо-квадратичне відхилення (СКВ): ", mean_sqrt)
-
-        if np.any(delta):
-            print("Динамічна похибка моделі: ", delta)
-
-        if np.any(mean_sqrt_extrapol):
-            print(
-                "Прогнозоване середньо-квадратичне відхилення (ПСКВ): ",
-                mean_sqrt_extrapol,
-            )
-
         print(divider)
 
     def stat_characts(self, data, title) -> None:
@@ -95,43 +73,3 @@ class Characteristics(ABC):
         mean_sqrt = mt.sqrt(dispersion)
 
         self._print_data(title, trend, mean, dispersion, mean_sqrt)
-
-    def stat_characts_out(self, data_in, data, title) -> None:
-        """Статистичні характеристики вибірки з урахуванням тренду"""
-
-        trend = self.model.mnk(data)
-        trend_len = len(trend)
-        data = np.subtract(data[:trend_len], trend[:trend_len, 0])
-
-        mean = np.mean(data)
-        dispersion = np.var(data)
-        mean_sqrt = mt.sqrt(dispersion)
-        delta = abs(data_in - trend)
-
-        self._print_data(title, trend, mean, dispersion, mean_sqrt, delta=delta)
-
-    def stat_characts_extrapol(self, data_in, coef, title) -> None:
-        """Статистичні характеристики екстрополярної вибірки з урахуванням тренду"""
-
-        trend = self.model.mnk(data_in)
-        trend_len = len(trend)
-        data = np.zeros((trend_len))
-
-        for i in range(trend_len):
-            data[i] = data_in[i, 0] - trend[i, 0]
-
-        mean = np.mean(data)
-        dispersion = np.var(data)
-        mean_sqrt = mt.sqrt(dispersion)
-        mean_sqrt_extrapol = (
-            mean_sqrt * coef
-        )  #  довірчий інтервал прогнозованих значень за СКВ
-
-        self._print_data(
-            title,
-            trend,
-            mean,
-            dispersion,
-            mean_sqrt,
-            mean_sqrt_extrapol=mean_sqrt_extrapol,
-        )
