@@ -3,58 +3,60 @@
 from abc import ABC
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class Rendering(ABC):
     """Rendering of data"""
 
-    def hist(self, *data, **kwargs) -> None:
-        """
-        Відображає гістограму результатів за допомогою matplotlib.
+    def _show_naming(self, graph_type, *args, **kwargs):
 
-        :param data: Масив або список чисел, які потрібно відобразити на гістограмі.
-        :param wargs: Додаткові параметри для налаштування гістограми:
-            - bins (int): Кількість бінів для гістограми.
-            - facecolor (str): Колір гістограми.
-            - alpha (float): Прозорість гістограми.
-        """
+        title = kwargs.pop("title", "")
+        labels = kwargs.pop("labels", [])
+        loc = kwargs.get("loc", "best")
+        xlabel = kwargs.pop("xlabel", "X-axis")
+        ylabel = kwargs.pop("ylabel", "Y-axis")
 
-        for i in data:
-            plt.hist(i, **kwargs)
+        min_val = np.inf
+        max_val = -np.inf
 
-        if kwargs.get("label"):
-            plt.legend(loc=kwargs.get("loc", "best"))
-
-        plt.show()
-
-    def plot(self, *data, xlabel="X-axis", ylabel="Y-axis", **kwargs) -> None:
-        """
-        Візуалізує дві криві на одному графіку.
-
-        :param data1: Перший масив даних (наприклад, початкова помилка).
-        :param data2: Другий масив даних (наприклад, ймовірність).
-        :param text: Назва графіка, що відображається на осі Y.
-
-        :return: None. Функція не повертає значення, а лише відображає графік.
-
-        Викликає:
-            - plt.clf(): Очищає поточний графік перед побудовою нового.
-            - plt.plot(): Функція для побудови графіка.
-            - plt.xlabel(): Встановлює мітку для осі X.
-            - plt.ylabel(): Встановлює мітку для осі Y.
-            - plt.show(): Функція для відображення побудованого графіка.
-        """
+        for i in args:
+            min_val = min(min_val, np.min(i))
+            max_val = max(max_val, np.max(i))
 
         plt.clf()  # Очищення холста
 
-        title = kwargs.pop("title", None)
+        match graph_type:
+            case "hist":
+                for i in args:
+                    plt.hist(i, **kwargs)
+            case "plot":
+                for i in args:
+                    plt.plot(i, **kwargs)
 
-        if title:
-            plt.title(title)
-
-        for i in data:
-            plt.plot(i, **kwargs)
-
+        plt.title(title)
+        plt.legend(labels, loc=loc)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
+        plt.ylim(min_val, max_val)
         plt.show()
+
+    def hist(self, *data, **kwargs) -> None:
+        """
+        Відображає гістограму результатів.
+
+        :param *data: Дані для відображення.
+        :param **wargs: Додаткові параметри для налаштування гістограми.
+        """
+
+        self._show_naming("hist", *data, **kwargs)
+
+    def plot(self, *data, **kwargs) -> None:
+        """
+        Візуалізує дані на графіку.
+
+        :param *data: Дані для відображення.
+        :param **wargs: Додаткові параметри для налаштування графіку.
+        """
+
+        self._show_naming("plot", *data, **kwargs)

@@ -24,11 +24,10 @@ class Characteristics(ABC):
         self,
         title,
         data,
-        mean,
         dispersion,
         mean_sqrt,
-        delta=None,
         mean_sqrt_extrapol=None,
+        delta=None,
     ) -> None:
         """
         Виводить всі статистичні характеристики розподілу.
@@ -47,6 +46,8 @@ class Characteristics(ABC):
             - Дисперсію (варіацію)
             - Середньо-квадратичне відхилення
         """
+
+        mean = np.mean(data)
 
         text = "-" * 10 + title + "-" * 10
         divider = "-" * len(text)
@@ -77,11 +78,10 @@ class Characteristics(ABC):
         :param title: Назва блоку.
         """
 
-        mean = np.mean(data)
         dispersion = np.var(data)
         mean_sqrt = np.sqrt(dispersion)
 
-        self._print_data(title, data, mean, dispersion, mean_sqrt)
+        self._print_data(title, data, dispersion, mean_sqrt)
 
     def stat_characts_in(self, data, title) -> None:
         """Статистичні характеристики вибірки з урахуванням тренду"""
@@ -90,38 +90,41 @@ class Characteristics(ABC):
         trend_len = len(trend)
         data = np.subtract(data[:trend_len], trend[:trend_len, 0])
 
-        mean = np.mean(data)
         dispersion = np.var(data)
         mean_sqrt = mt.sqrt(dispersion)
 
-        self._print_data(title, trend, mean, dispersion, mean_sqrt)
+        self._print_data(title, trend, dispersion, mean_sqrt)
 
-    def stat_characts_out(self, data_in, data, title) -> None:
+    def stat_characts_out(self, data, data_sw, title) -> None:
         """Статистичні характеристики вибірки з урахуванням тренду"""
 
         trend = self.model.mnk(data)
         trend_len = len(trend)
-        data = np.subtract(data[:trend_len], trend[:trend_len, 0])
+        data_subtract = np.subtract(data_sw[:trend_len], trend[:trend_len])
 
-        mean = np.mean(data)
-        dispersion = np.var(data)
+        dispersion = np.var(data_subtract)
         mean_sqrt = mt.sqrt(dispersion)
-        delta = abs(data_in - trend)
 
-        self._print_data(title, trend, mean, dispersion, mean_sqrt, delta=delta)
-
-    def stat_characts_extrapol(self, data_in, coef, title) -> None:
-        """Статистичні характеристики екстрополярної вибірки з урахуванням тренду"""
-
-        trend = self.model.mnk(data_in)
-        trend_len = len(trend)
-        data = np.zeros((trend_len))
+        delta = 0
 
         for i in range(trend_len):
-            data[i] = data_in[i, 0] - trend[i, 0]
+            delta = delta + abs(data[i] - trend[i])
 
-        mean = np.mean(data)
-        dispersion = np.var(data)
+        delta = delta / (trend_len + 1)
+
+        self._print_data(title, trend, dispersion, mean_sqrt, delta=delta)
+
+    def stat_characts_extrapol(self, data, coef, title) -> None:
+        """Статистичні характеристики екстрополярної вибірки з урахуванням тренду"""
+
+        trend = self.model.mnk(data)
+        trend_len = len(trend)
+        new_data = np.zeros((trend_len))
+
+        for i in range(trend_len):
+            new_data[i] = data[i, 0] - trend[i, 0]
+
+        dispersion = np.var(new_data)
         mean_sqrt = mt.sqrt(dispersion)
         mean_sqrt_extrapol = (
             mean_sqrt * coef
@@ -130,8 +133,38 @@ class Characteristics(ABC):
         self._print_data(
             title,
             trend,
-            mean,
             dispersion,
             mean_sqrt,
             mean_sqrt_extrapol=mean_sqrt_extrapol,
         )
+
+    def qual_assess(self, data, model, title):  # determination
+        """Коефіцієнт детермінації - оцінювання якості моделі"""
+        # статистичні характеристики вибірки з урахуванням тренду
+
+        data_size = len(model)
+        numerator = 0
+        denominator_1 = 0
+
+        for i in range(data_size):
+            numerator = numerator + (data[i] - model[i, 0]) ** 2
+            denominator_1 = denominator_1 + data[i]
+
+        denominator_2 = 0
+
+        for i in range(data_size):
+            denominator_2 = denominator_2 + (data[i] - (denominator_1 / data_size)) ** 2
+
+        r2_score_our = 1 - (numerator / denominator_2)
+
+        text = "-" * 10 + title + "-" * 10
+        divider = "-" * len(text)
+
+        print(divider)
+        print(text)
+        print("Кількість елементів вбірки: ", data_size)
+        print(
+            "Коефіцієнт детермінації (ймовірність апроксимації)",
+            r2_score_our,
+        )
+        print(divider)

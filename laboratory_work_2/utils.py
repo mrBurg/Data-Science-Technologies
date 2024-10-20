@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 
+# from pathlib import Path
+
 import pandas as pd
 import numpy as np
 
@@ -9,6 +11,8 @@ import numpy as np
 @dataclass
 class Utils:
     """Utils"""
+
+    # Path(__file__).parent.joinpath("./").resolve()
 
     def read_excel(self, file_path: str, file_name: str, data_name: str) -> np.ndarray:
         """File parsing"""

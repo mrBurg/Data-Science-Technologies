@@ -55,7 +55,7 @@ class Model(Characts, Render):
 
     # uniform,
     def abnormal(
-        self, data_size, abnorm_size, data, coef, coef_prefer, mean=0, mean_sqrt=0
+        self, data, abnorm_size, coef, coef_prefer, mean=0, mean_sqrt=0
     ) -> np.ndarray:
         # def abnormal(self, data_size, data, coef, mean=0, mean_sqrt=0) -> np.ndarray:
         """
@@ -74,7 +74,7 @@ class Model(Characts, Render):
 
         # random_indices = np.random.choice(data_size, data_size, replace=False)
 
-        ideal_model = self.ideal(data_size, coef)
+        ideal_model = self.ideal(len(data), coef)
         normal_model = self.normal(ideal_model, data)
 
         model_data = normal_model
@@ -101,6 +101,7 @@ class Model(Characts, Render):
 
         :return: Масив значень тренду, отриманих за допомогою МНК.
         """
+
         data_size = len(data)
         yin = np.zeros((data_size, 1))  # Матриця вхідних даних
         f = np.ones((data_size, 3))  # Матриця функцій для МНК
@@ -190,21 +191,3 @@ class Model(Characts, Render):
             data_midi[j] = data[j]
 
         return data_midi
-
-    # def r2_score(self, SL, Yout, Text): # determination
-    #     """Коефіцієнт детермінації - оцінювання якості моделі"""
-    #     # статистичні характеристики вибірки з урахуванням тренду
-
-    #     data_size = len(Yout)
-    #     numerator = 0
-    #     denominator_1 = 0
-    #     for i in range(data_size):
-    #         numerator = numerator + (SL[i] - Yout[i, 0]) ** 2
-    #         denominator_1 = denominator_1 + SL[i]
-    #     denominator_2 = 0
-    #     for i in range(data_size):
-    #         denominator_2 = denominator_2 + (SL[i] - (denominator_1 / data_size)) ** 2
-    #     R2_score_our = 1 - (numerator / denominator_2)
-    #     print("------------", Text, "-------------")
-    #     print("кількість елементів вбірки=", data_size)
-    #     print("Коефіцієнт детермінації (ймовірність апроксимації)=", R2_score_our)
