@@ -36,7 +36,10 @@ if __name__ == "__main__":
     COEF_EXTRAPOL = mt.ceil(DATA_SIZE * 0.5)
 
     data_uniform = data.uniform(DATA_SIZE, MAX_VAL, MIN_VAL)
+    model.stat_characts(data_uniform, title="Статистичні характеристики РІВНОМІРНИЙ")
+
     permanent_model = model.permanent(DATA_SIZE, MEAN)
+    model.stat_characts(permanent_model, title="Статистичні характеристики ПОСТІЙНА")
 
     labels = ["Рівномірні", "Постійні"]
     model.hist(
@@ -56,6 +59,7 @@ if __name__ == "__main__":
     abnormal_model = model.abnormal(
         data_uniform, ABNORM_SIZE, COEF, COEF_PREFER, MEAN, MEAN_SQRT
     )
+    model.stat_characts(data_uniform, title="Статистичні характеристики АНОМАЛЬНий")
 
     labels = ["Рівномірні", "Аномальні"]
     model.plot(
@@ -75,11 +79,21 @@ if __name__ == "__main__":
         title="Згладжена, вибірка очищена алгоритмом sliding wind",
     )
 
+    labels = ["Рівномірні", "Очищені"]
+    model.plot(
+        data_uniform,
+        sliding_wind,
+        title="Графік " + " + ".join(labels) + " дані",
+        labels=labels,
+    )
+
     model.qual_assess(
         sliding_wind, model.mnk(data_uniform), "Характеристики оцінювання"
     )
 
     extrapol = model.mnk_extrapol(sliding_wind, COEF_EXTRAPOL)
+    model.stat_characts(data_uniform, title="Статистичні характеристики ЕКСТРАПОЛЯЦІЇ")
+
     labels = ["Прогнозування", "алгоритм sliding wind"]
     model.plot(
         sliding_wind,
