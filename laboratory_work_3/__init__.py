@@ -90,4 +90,5 @@ if __name__ == "__main__":
     matrix_data_size = np.shape(matrix_data)
     matrix_row_len = int(matrix_data_size[0])  # Рядки
 
+    print(file_data)
     voronin(file_data, matrix_data, np.ones(matrix_row_len))
