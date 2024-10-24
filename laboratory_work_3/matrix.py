@@ -18,11 +18,12 @@ class Matrix(Utils):
         """generation"""
 
         title_data = data.columns
-        line_data = int(data.shape[0])  # Рядки
-        column_data = int(data.shape[1])  # Колонки
-        matrix_data = np.zeros((line_data, (column_data - 2)))
+        matrix_size = np.shape(data)
+        row_len = int(matrix_size[0])  # Рядки
+        col_len = int(matrix_size[1])  # Колонки
+        matrix_data = np.zeros((row_len, (col_len - 2)))
 
-        for i in range(1, column_data - 1, 1):
+        for i in range(1, col_len - 1):
             file_data = self.file_parsing(title_data[i], data)
             matrix_data[:, i - 1] = file_data
 
@@ -31,10 +32,10 @@ class Matrix(Utils):
     def adapter(self, data, line):
         """adapter"""
 
-        matrix_props = np.shape(data)
-        matrix_data = np.zeros(matrix_props[1])
+        matrix_size = np.shape(data)
+        col_len = int(matrix_size[1])  # Колонки
+        matrix_data = np.zeros((col_len))
 
-        for i in range(matrix_props[1]):
-            matrix_data[i] = data[line, i]
+        matrix_data[:] = data[line, :]
 
         return matrix_data

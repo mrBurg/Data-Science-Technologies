@@ -1,10 +1,11 @@
 """Laboratory work 2"""
 
-# pylint: disable=E1121, E0401, R0913
+# pylint: disable=E1121, E0401, R0913, R0914
 
 # import math as mt
 # from pathlib import Path
 from pathlib import Path
+import math as mt
 
 import numpy as np
 
@@ -17,49 +18,58 @@ matrix = Matrix()
 def voronin(data_origin, data, coef_prefer):
     """Voronin"""
 
-    column_len = np.shape(data)[1]  # Кількість колонок
+    matrix_size = np.shape(data)
+    row_len = int(matrix_size[0])  # Рядки
+    col_len = int(matrix_size[1])  # Колонки
 
-    f1f9 = []  # data_list
+    data_list = np.empty((row_len, col_len))
 
-    for i in range(column_len):
-        f1f9.append(matrix.adapter(data, i))
+    for i in range(row_len):
+        data_list[i] = matrix.adapter(data, i)
 
-    g10g90 = []
-    gnorm = np.sum(coef_prefer)  # coef_prefer_sum
-    g10g90[:] = coef_prefer / gnorm
+    col_name = data_origin.columns[len(data_origin.columns) - 1]
+    criteries = data_origin[col_name]
 
-    column_name = data_origin.columns[len(data_origin.columns) - 1]
-    criteries = data_origin[column_name]
+    row_sum = np.zeros(row_len)
 
-    sum_f1_sum_f9 = []
+    for i, item in enumerate(data_list):
+        row_sum[i] = 0
 
-    for item in f1f9:
-        for i in range(column_len):
+        for j in item:
             if criteries[i] == "макс":
-                sum_f1_sum_f9.append(1 / item[i])
+                row_sum[i] += 1 / j
 
                 continue
 
-            sum_f1_sum_f9.append(item[i])
+            row_sum[i] += j
 
-    f10f90 = []  # data_dimens
-    integro = np.zeros(column_len)
+    coef_prefer_data = []
+    gnorm = np.sum(coef_prefer)
+    coef_prefer_data[:] = coef_prefer / gnorm
 
-    for i, item in enumerate(f1f9):
-        for j in range(column_len):
-            if criteries[j] == "макс":
-                sum_f1_sum_f9.append((1 / item[j]) / sum_f1_sum_f9[j])
+    normals = np.zeros((row_len, col_len))
+
+    for i in range(row_len):
+        for j in range(col_len):
+            if criteries[i] == "макс":
+                normals[i][j] = (1 / data_list[i][j]) / row_sum[j]
 
                 continue
 
-            f10f90.append(item[j] / sum_f1_sum_f9[j])
+            normals[i][j] = data_list[i][j] / row_sum[j]
 
-            integro[j] = g10g90[j] + (1 - f10f90[i]) ** (-1)
+    integro = np.zeros(col_len)
 
-    min_val = 10000
+    for i in range(col_len):
+        integro[i] = 0
+
+        for j in range(row_len):
+            integro[i] += coef_prefer_data[j] * (1 - normals[j][i]) ** (-1)
+
+    min_val = 100
     opt = 0
 
-    for i in range(column_len):
+    for i in range(col_len):
         if min_val > integro[i]:
             min_val = integro[i]
             opt = i
@@ -77,7 +87,7 @@ if __name__ == "__main__":
 
     file_data = utils.read_excel(root_file_path, FILE_NAME)
     matrix_data = matrix.generation(file_data)
+    matrix_data_size = np.shape(matrix_data)
+    matrix_row_len = int(matrix_data_size[0])  # Рядки
 
-    voronin(file_data, matrix_data, np.ones(len(matrix_data[1])))
-
-    # print(file_data)
+    voronin(file_data, matrix_data, np.ones(matrix_row_len))
