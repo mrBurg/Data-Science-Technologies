@@ -1,4 +1,4 @@
-"""Laboratory work 2"""
+"""Laboratory work 3"""
 
 # pylint: disable=E1121, E0401, R0913, R0914
 
