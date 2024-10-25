@@ -12,6 +12,7 @@
 2. .\venv\Scripts\activate (powershell) ./venv/Scripts/activate (Git bash)
 3. deactivate
 4. pip install [module name]
+5. pip show [package name]
 
 ### Generate requirements
 

@@ -52,11 +52,11 @@ def voronin(data_origin, data, coef_prefer):
     for i in range(row_len):
         for j in range(col_len):
             if criteries[i] == "макс":
-                normals[i][j] = (1 / data_list[i][j]) / row_sum[j]
+                normals[i][j] = (1 / data_list[i][j]) / row_sum[i]
 
                 continue
 
-            normals[i][j] = data_list[i][j] / row_sum[j]
+            normals[i][j] = data_list[i][j] / row_sum[i]
 
     integro = np.zeros(col_len)
 
