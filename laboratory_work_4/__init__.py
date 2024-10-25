@@ -4,8 +4,6 @@
 
 from pathlib import Path
 
-import pylab
-
 from utils import Utils
 from model import Model
 from voronin import Voronin
