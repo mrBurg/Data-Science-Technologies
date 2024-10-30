@@ -1,4 +1,4 @@
-"""Laboratory work 4"""
+"""Laboratory work 5"""
 
 # pylint: disable=E0401
 
