@@ -11,26 +11,26 @@ import keyboard
 class KeyboardHandler:
     """KeyboardHandler"""
 
-    keys = {"up": False, "down": False, "q": False, "enter": False}
+    keys = {"up": False, "down": False, "q": False, "space": False}
     pressed_key = None
 
     def get_key(self):
         """get_key"""
 
-        for i in list(self.keys.keys()):
+        for i in self.keys:
             self.keys[i] = keyboard.is_pressed(i)
 
             if self.keys[i]:
                 self.pressed_key = i
 
-        keyboard.hook(self.hook)
+        keyboard.hook(self._hook)
 
         return self.pressed_key
 
-    def hook(self, event):
+    def _hook(self, event):
         """hook"""
 
-        if event.event_type == "down":
-            pass
-        elif event.event_type == "up":
+        if event.event_type == "up":
             self.pressed_key = False
+        elif event.event_type == "down":
+            pass

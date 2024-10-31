@@ -1,20 +1,29 @@
 """Utils"""
 
+# pylint: disable=R0913
+
 from typing import Callable
-from dataclasses import dataclass
 import time
 from pathlib import Path
+import os
 
 import pandas as pd
 
+pd.set_option("future.no_silent_downcasting", True)
 
-@dataclass
+
 class Utils:
     """Utils"""
 
     @staticmethod
+    def clear_cinsole():
+        """clear_cinsole"""
+
+        os.system("cls" if os.name == "nt" else "clear")
+
+    @staticmethod
     def read_excel(file_path: Path, file_name: str, **kwargs):
-        """File reading"""
+        """read_excel"""
 
         full_path = file_path / file_name
 
@@ -33,3 +42,25 @@ class Utils:
 
         while loop_callback():
             time.sleep(speed)
+
+    @staticmethod
+    def file_parsing(
+        data_frame,
+        row_start=None,
+        row_end=None,
+        col_start=None,
+        col_end=None,
+        replacer=None,
+    ):
+        """File parsing"""
+
+        if replacer is None:
+            replacer = {}
+
+        data_frame.iloc[slice(row_start, row_end), slice(col_start, col_end)] = (
+            data_frame.iloc[
+                slice(row_start, row_end), slice(col_start, col_end)
+            ].replace(replacer)
+        )
+
+        return data_frame
