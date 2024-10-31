@@ -18,6 +18,8 @@ class Rendering(ABC):
         labels = kwargs.pop("labels", None)
         xlabel = kwargs.pop("xlabel", None)  # "X-axis"
         ylabel = kwargs.pop("ylabel", None)  # "Y-axis"
+        xticks = kwargs.pop("xticks", None)
+        yticks = kwargs.pop("yticks", None)
         loc = kwargs.get("loc", "best")
 
         if title:
@@ -34,5 +36,14 @@ class Rendering(ABC):
 
         if ylabel:
             plt.ylabel(ylabel)
+
+        if xticks and len(xticks):
+            plt.xticks(
+                [i for i, _ in enumerate(xticks)],
+                [item[:3] for _, item in enumerate(xticks)],
+            )
+
+        if yticks:
+            plt.yticks(yticks)
 
         plt.show()

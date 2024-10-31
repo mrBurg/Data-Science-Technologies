@@ -50,17 +50,17 @@ class Utils:
         row_end=None,
         col_start=None,
         col_end=None,
-        replacer=None,
+        replace=None,
     ):
         """File parsing"""
 
-        if replacer is None:
-            replacer = {}
+        if replace is None:
+            replace = {}
 
         data_frame.iloc[slice(row_start, row_end), slice(col_start, col_end)] = (
-            data_frame.iloc[
-                slice(row_start, row_end), slice(col_start, col_end)
-            ].replace(replacer)
+            data_frame.iloc[slice(row_start, row_end), slice(col_start, col_end)]
+            .map(lambda x: x.strip() if isinstance(x, str) else x)
+            .replace(replace)
         )
 
         return data_frame
