@@ -16,8 +16,8 @@ class Utils:
     """Utils"""
 
     @staticmethod
-    def clear_cinsole():
-        """clear_cinsole"""
+    def clear_console():
+        """clear_console"""
 
         os.system("cls" if os.name == "nt" else "clear")
 

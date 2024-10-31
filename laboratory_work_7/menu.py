@@ -36,7 +36,7 @@ class Menu:
     def _display_menu(self):
         """display_menu"""
 
-        Utils.clear_cinsole()
+        Utils.clear_console()
 
         print(
             'Для використання меню використовуйте:\n"вгору" та "вниз" для перемикання\n"space" для підтвердження вибору\n"q" скасування\n'
